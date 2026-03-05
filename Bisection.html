@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Bisección - AppMétodos</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link href="css/styles.css" rel="stylesheet">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
     <script defer src="https://unpkg.com/mathlive"></script>
@@ -12,7 +12,7 @@
 <body>
 <div class="container">
     <header>
-        <a href="index.html" class="back-link">← Volver al Menú</a>
+        <a class="back-link" href="index.html">← Volver al Menú</a>
         <h1>Método de Bisección</h1>
     </header>
 
@@ -20,30 +20,30 @@
         <section class="input-section">
             <div class="form-group">
                 <label>Función f(x):</label>
-                <math-field id="mathInput" virtual-keyboard-mode="onfocus" class="math-input"></math-field>
+                <math-field class="math-input" id="mathInput" virtual-keyboard-mode="onfocus"></math-field>
             </div>
 
             <div class="controls-row">
                 <div class="form-group">
                     <label for="inputXi">Límite Inferior (Xi):</label>
-                    <input type="number" id="inputXi" value="0" step="any">
+                    <input id="inputXi" step="any" type="number" value="0">
                 </div>
                 <div class="form-group">
                     <label for="inputXu">Límite Superior (Xu):</label>
-                    <input type="number" id="inputXu" value="1" step="any">
+                    <input id="inputXu" step="any" type="number" value="1">
                 </div>
                 <div class="form-group">
                     <label for="tolerance">Tolerancia (%):</label>
-                    <input type="number" id="tolerance" value="0.01" step="0.001">
+                    <input id="tolerance" step="0.001" type="number" value="0.01">
                 </div>
             </div>
 
-            <button id="btnSolve" class="btn-primary" data-method="biseccion">Calcular Raíz</button>
+            <button class="btn-primary" data-method="biseccion" id="btnSolve">Calcular Raíz</button>
         </section>
 
         <section class="results-section" id="resultsSection" style="display: none;">
             <div class="metrics-summary">
-                <h3>Raíz Aproximada: <span id="finalRoot" class="highlight">-</span></h3>
+                <h3>Raíz Aproximada: <span class="highlight" id="finalRoot">-</span></h3>
                 <p>Iteraciones: <span id="totalIter">-</span> | Error: <span id="finalError">-</span>%</p>
             </div>
 
