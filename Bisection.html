@@ -1,10 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bisección - AppMétodos</title>
+    <link rel="stylesheet" href="css/styles.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
+    <script defer src="https://unpkg.com/mathlive"></script>
 </head>
 <body>
+<div class="container">
+    <header>
+        <a href="index.html" class="back-link">← Volver al Menú</a>
+        <h1>Método de Bisección</h1>
+    </header>
 
+    <main>
+        <section class="input-section">
+            <div class="form-group">
+                <label>Función f(x):</label>
+                <math-field id="mathInput" virtual-keyboard-mode="onfocus" class="math-input"></math-field>
+            </div>
+
+            <div class="controls-row">
+                <div class="form-group">
+                    <label for="inputXi">Límite Inferior (Xi):</label>
+                    <input type="number" id="inputXi" value="0" step="any">
+                </div>
+                <div class="form-group">
+                    <label for="inputXu">Límite Superior (Xu):</label>
+                    <input type="number" id="inputXu" value="1" step="any">
+                </div>
+                <div class="form-group">
+                    <label for="tolerance">Tolerancia (%):</label>
+                    <input type="number" id="tolerance" value="0.01" step="0.001">
+                </div>
+            </div>
+
+            <button id="btnSolve" class="btn-primary" data-method="biseccion">Calcular Raíz</button>
+        </section>
+
+        <section class="results-section" id="resultsSection" style="display: none;">
+            <div class="metrics-summary">
+                <h3>Raíz Aproximada: <span id="finalRoot" class="highlight">-</span></h3>
+                <p>Iteraciones: <span id="totalIter">-</span> | Error: <span id="finalError">-</span>%</p>
+            </div>
+
+            <div class="table-container">
+                <table id="resultsTable">
+                    <thead>
+                    <tr>
+                        <th>Iter</th>
+                        <th>Xi</th>
+                        <th>Xu</th>
+                        <th>Xr</th>
+                        <th>f(Xi)</th>
+                        <th>f(Xr)</th>
+                        <th>Error (%)</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+<script src="Js/Bisection.js"></script>
 </body>
 </html>
