@@ -1,5 +1,4 @@
 /**
- * Motor de Evaluación Matemática
  * Convierte el input de MathLive a una expresión evaluable por Math.js
  */
 class EvaluadorMatematico {
@@ -10,10 +9,10 @@ class EvaluadorMatematico {
             throw new Error("La expresión matemática está vacía o es inválida.");
         }
 
-        // Compilación de la función principal
+        // Compilación
         this.expr = math.compile(rawExpression);
 
-        // Compilación de la derivada simbólica (Requerida para Newton)
+        // Compilación de derivada
         try {
             this.deriv = math.derivative(rawExpression, 'x').compile();
         } catch (e) {
@@ -81,7 +80,7 @@ class MetodosNumericos {
         const evalXi = evaluador.evaluar(xi);
         const evalXu = evaluador.evaluar(xu);
 
-        // Condiciones de frontera: la raíz es un límite exacto
+        // Condiciones de frontera
         if (Math.abs(evalXi) < 1e-15) return {raiz: xi, iteraciones: 0, error: 0};
         if (Math.abs(evalXu) < 1e-15) return {raiz: xu, iteraciones: 0, error: 0};
 
@@ -146,8 +145,6 @@ class MetodosNumericos {
             const xi_next = xi - (fXi / dfXi);
 
             if (iter > 1) {
-                // Corrección analítica para raíces múltiples / aproximación al origen
-                // Se amplía la tolerancia a 1.0 para transicionar a error absoluto escalado
                 if ((xi_next * xi <= 0) || Math.abs(xi_next) < 1.0) {
                     error = Math.abs(xi_next - xi) * 100;
                 } else {
@@ -155,7 +152,7 @@ class MetodosNumericos {
                 }
             }
 
-            // Verificación residual estricta
+            // Verificación residual
             if (Math.abs(evaluador.evaluar(xi_next)) < 1e-15) error = 0;
 
             await ui.insertarFilaAnimada([
@@ -174,7 +171,6 @@ class MetodosNumericos {
         let xi = x0;
         let error = 100, iter = 0;
 
-        // Condiciones de frontera en los valores iniciales
         const f_m1_init = evaluador.evaluar(x_m1);
         const f_xi_init = evaluador.evaluar(xi);
 
@@ -240,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let resultado;
 
-            // Enrutamiento algorítmico determinado por el data-method del HTML
+            // Enrutamiento algorítmico
             switch (metodo) {
                 case 'biseccion':
                     const xi = parseFloat(document.getElementById('inputXi').value);

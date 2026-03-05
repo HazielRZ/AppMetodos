@@ -126,6 +126,7 @@ input {
 
 /* Tablas y Animación */
 table {
+    border-radius: 5px;
     width: 100%;
     border-collapse: collapse;
     margin-top: 1.5rem;
