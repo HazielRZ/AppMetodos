@@ -9,10 +9,8 @@ class EvaluadorMatematico {
             throw new Error("La expresión matemática está vacía o es inválida.");
         }
 
-        // Compilación
         this.expr = math.compile(rawExpression);
 
-        // Compilación de derivada
         try {
             this.deriv = math.derivative(rawExpression, 'x').compile();
         } catch (e) {
@@ -55,7 +53,7 @@ class InterfazTabla {
         tr.innerHTML = datos.map(val => `<td>${val}</td>`).join('');
         this.tbody.appendChild(tr);
 
-        void tr.offsetWidth; // Forzar reflow
+        void tr.offsetWidth;
         tr.classList.add('visible');
         tr.scrollIntoView({behavior: 'smooth', block: 'end'});
 
@@ -74,13 +72,25 @@ class InterfazTabla {
  * Suite de Algoritmos Numéricos
  */
 class MetodosNumericos {
+
+    /**
+     * Función centralizada para el cálculo riguroso del error iterativo.
+     * Evalúa la transición al error absoluto escalado para evitar divisiones por cero
+     * o bucles infinitos causados por oscilaciones en el origen.
+     */
+    static calcularError(actual, anterior, umbralOrigen = 1e-3) {
+        if ((actual * anterior <= 0) || Math.abs(actual) < umbralOrigen) {
+            return Math.abs(actual - anterior) * 100; // Error absoluto escalado
+        } else {
+            return Math.abs((actual - anterior) / actual) * 100; // Error relativo porcentual
+        }
+    }
+
     static async biseccion(evaluador, xi, xu, tol, ui) {
         let xr = 0, xrOld = 0, error = 100, iter = 0;
-
         const evalXi = evaluador.evaluar(xi);
         const evalXu = evaluador.evaluar(xu);
 
-        // Condiciones de frontera
         if (Math.abs(evalXi) < 1e-15) return {raiz: xi, iteraciones: 0, error: 0};
         if (Math.abs(evalXu) < 1e-15) return {raiz: xu, iteraciones: 0, error: 0};
 
@@ -96,14 +106,7 @@ class MetodosNumericos {
             const fXi = evaluador.evaluar(xi);
             const fXr = evaluador.evaluar(xr);
 
-            if (iter > 1) {
-                if ((xr * xrOld < 0) || Math.abs(xr) < 1e-3) {
-                    error = Math.abs(xr - xrOld) * 100;
-                } else {
-                    error = Math.abs((xr - xrOld) / xr) * 100;
-                }
-            }
-
+            if (iter > 1) error = this.calcularError(xr, xrOld, 1e-3);
             if (Math.abs(fXr) < 1e-15) error = 0;
 
             await ui.insertarFilaAnimada([
@@ -111,13 +114,49 @@ class MetodosNumericos {
                 fXi.toFixed(5), fXr.toFixed(5), iter === 1 ? '-' : error.toFixed(5)
             ]);
 
-            if (fXi * fXr < 0) {
-                xu = xr;
-            } else if (fXi * fXr > 0) {
-                xi = xr;
-            } else {
-                error = 0;
-            }
+            if (fXi * fXr < 0) xu = xr;
+            else if (fXi * fXr > 0) xi = xr;
+            else error = 0;
+
+            if (error === 0) break;
+        }
+        return {raiz: xr, iteraciones: iter, error: error};
+    }
+
+    static async falsaPosicion(evaluador, xi, xu, tol, ui) {
+        let xr = 0, xrOld = 0, error = 100, iter = 0;
+        const evalXi = evaluador.evaluar(xi);
+        const evalXu = evaluador.evaluar(xu);
+
+        if (Math.abs(evalXi) < 1e-15) return {raiz: xi, iteraciones: 0, error: 0};
+        if (Math.abs(evalXu) < 1e-15) return {raiz: xu, iteraciones: 0, error: 0};
+
+        if (evalXi * evalXu > 0) {
+            throw new Error("El intervalo no encierra una raíz (f(xi) y f(xu) tienen el mismo signo).");
+        }
+
+        while (error > tol && iter < 100) {
+            iter++;
+            xrOld = xr;
+
+            const fXi = evaluador.evaluar(xi);
+            const fXu = evaluador.evaluar(xu);
+
+            xr = xu - (fXu * (xi - xu)) / (fXi - fXu);
+            const fXr = evaluador.evaluar(xr);
+
+            if (iter > 1) error = this.calcularError(xr, xrOld, 1e-3);
+            if (Math.abs(fXr) < 1e-15) error = 0;
+
+            await ui.insertarFilaAnimada([
+                iter, xi.toFixed(5), xu.toFixed(5), xr.toFixed(5),
+                fXi.toFixed(5), fXr.toFixed(5), iter === 1 ? '-' : error.toFixed(5)
+            ]);
+
+            if (fXi * fXr < 0) xu = xr;
+            else if (fXi * fXr > 0) xi = xr;
+            else error = 0;
+
             if (error === 0) break;
         }
         return {raiz: xr, iteraciones: iter, error: error};
@@ -127,7 +166,6 @@ class MetodosNumericos {
         let xi = x0;
         let error = 100, iter = 0;
 
-        // Condición de frontera inicial
         if (Math.abs(evaluador.evaluar(xi)) < 1e-15) {
             await ui.insertarFilaAnimada([0, xi.toFixed(5), "0.00000", "-", "-", "0.00000"]);
             return {raiz: xi, iteraciones: 0, error: 0};
@@ -144,15 +182,7 @@ class MetodosNumericos {
 
             const xi_next = xi - (fXi / dfXi);
 
-            if (iter > 1) {
-                if ((xi_next * xi <= 0) || Math.abs(xi_next) < 1.0) {
-                    error = Math.abs(xi_next - xi) * 100;
-                } else {
-                    error = Math.abs((xi_next - xi) / xi_next) * 100;
-                }
-            }
-
-            // Verificación residual
+            if (iter > 1) error = this.calcularError(xi_next, xi, 1.0);
             if (Math.abs(evaluador.evaluar(xi_next)) < 1e-15) error = 0;
 
             await ui.insertarFilaAnimada([
@@ -191,14 +221,7 @@ class MetodosNumericos {
 
             const xi_next = xi - (f_xi * (x_m1 - xi)) / diferencial_f;
 
-            if (iter > 1) {
-                if ((xi_next * xi < 0) || Math.abs(xi_next) < 1e-4) {
-                    error = Math.abs(xi_next - xi) * 100;
-                } else {
-                    error = Math.abs((xi_next - xi) / xi_next) * 100;
-                }
-            }
-
+            if (iter > 1) error = this.calcularError(xi_next, xi, 1e-4);
             if (Math.abs(evaluador.evaluar(xi_next)) < 1e-15) error = 0;
 
             await ui.insertarFilaAnimada([
@@ -211,61 +234,6 @@ class MetodosNumericos {
             if (error === 0) break;
         }
         return {raiz: xi, iteraciones: iter, error: error};
-    }
-    static async falsaPosicion(evaluador, xi, xu, tol, ui) {
-        let xr = 0, xrOld = 0, error = 100, iter = 0;
-
-        const evalXi = evaluador.evaluar(xi);
-        const evalXu = evaluador.evaluar(xu);
-
-        // Condiciones de frontera
-        if (Math.abs(evalXi) < 1e-15) return {raiz: xi, iteraciones: 0, error: 0};
-        if (Math.abs(evalXu) < 1e-15) return {raiz: xu, iteraciones: 0, error: 0};
-
-        if (evalXi * evalXu > 0) {
-            throw new Error("El intervalo no encierra una raíz (f(xi) y f(xu) tienen el mismo signo).");
-        }
-
-        while (error > tol && iter < 100) {
-            iter++;
-            xrOld = xr;
-
-            const fXi = evaluador.evaluar(xi);
-            const fXu = evaluador.evaluar(xu);
-
-            // Fórmula analítica de la Falsa Posición
-            xr = xu - (fXu * (xi - xu)) / (fXi - fXu);
-
-            const fXr = evaluador.evaluar(xr);
-
-            if (iter > 1) {
-                // Mitigación de discontinuidad asintótica en el origen
-                if ((xr * xrOld < 0) || Math.abs(xr) < 1e-3) {
-                    error = Math.abs(xr - xrOld) * 100;
-                } else {
-                    error = Math.abs((xr - xrOld) / xr) * 100;
-                }
-            }
-
-            if (Math.abs(fXr) < 1e-15) error = 0;
-
-            // Renderizado en tabla
-            await ui.insertarFilaAnimada([
-                iter, xi.toFixed(5), xu.toFixed(5), xr.toFixed(5),
-                fXi.toFixed(5), fXr.toFixed(5), iter === 1 ? '-' : error.toFixed(5)
-            ]);
-
-            // Reevaluación del subintervalo
-            if (fXi * fXr < 0) {
-                xu = xr;
-            } else if (fXi * fXr > 0) {
-                xi = xr;
-            } else {
-                error = 0;
-            }
-            if (error === 0) break;
-        }
-        return {raiz: xr, iteraciones: iter, error: error};
     }
 }
 
@@ -291,7 +259,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let resultado;
 
-            // Enrutamiento algorítmico
             switch (metodo) {
                 case 'biseccion':
                     const xi_bis = parseFloat(document.getElementById('inputXi').value);
