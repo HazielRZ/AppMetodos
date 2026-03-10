@@ -212,6 +212,61 @@ class MetodosNumericos {
         }
         return {raiz: xi, iteraciones: iter, error: error};
     }
+    static async falsaPosicion(evaluador, xi, xu, tol, ui) {
+        let xr = 0, xrOld = 0, error = 100, iter = 0;
+
+        const evalXi = evaluador.evaluar(xi);
+        const evalXu = evaluador.evaluar(xu);
+
+        // Condiciones de frontera
+        if (Math.abs(evalXi) < 1e-15) return {raiz: xi, iteraciones: 0, error: 0};
+        if (Math.abs(evalXu) < 1e-15) return {raiz: xu, iteraciones: 0, error: 0};
+
+        if (evalXi * evalXu > 0) {
+            throw new Error("El intervalo no encierra una raíz (f(xi) y f(xu) tienen el mismo signo).");
+        }
+
+        while (error > tol && iter < 100) {
+            iter++;
+            xrOld = xr;
+
+            const fXi = evaluador.evaluar(xi);
+            const fXu = evaluador.evaluar(xu);
+
+            // Fórmula analítica de la Falsa Posición
+            xr = xu - (fXu * (xi - xu)) / (fXi - fXu);
+
+            const fXr = evaluador.evaluar(xr);
+
+            if (iter > 1) {
+                // Mitigación de discontinuidad asintótica en el origen
+                if ((xr * xrOld < 0) || Math.abs(xr) < 1e-3) {
+                    error = Math.abs(xr - xrOld) * 100;
+                } else {
+                    error = Math.abs((xr - xrOld) / xr) * 100;
+                }
+            }
+
+            if (Math.abs(fXr) < 1e-15) error = 0;
+
+            // Renderizado en tabla
+            await ui.insertarFilaAnimada([
+                iter, xi.toFixed(5), xu.toFixed(5), xr.toFixed(5),
+                fXi.toFixed(5), fXr.toFixed(5), iter === 1 ? '-' : error.toFixed(5)
+            ]);
+
+            // Reevaluación del subintervalo
+            if (fXi * fXr < 0) {
+                xu = xr;
+            } else if (fXi * fXr > 0) {
+                xi = xr;
+            } else {
+                error = 0;
+            }
+            if (error === 0) break;
+        }
+        return {raiz: xr, iteraciones: iter, error: error};
+    }
 }
 
 // ==========================================
@@ -239,9 +294,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // Enrutamiento algorítmico
             switch (metodo) {
                 case 'biseccion':
-                    const xi = parseFloat(document.getElementById('inputXi').value);
-                    const xu = parseFloat(document.getElementById('inputXu').value);
-                    resultado = await MetodosNumericos.biseccion(evaluador, xi, xu, tol, ui);
+                    const xi_bis = parseFloat(document.getElementById('inputXi').value);
+                    const xu_bis = parseFloat(document.getElementById('inputXu').value);
+                    resultado = await MetodosNumericos.biseccion(evaluador, xi_bis, xu_bis, tol, ui);
+                    break;
+                case 'falsaposicion':
+                    const xi_fp = parseFloat(document.getElementById('inputXi').value);
+                    const xu_fp = parseFloat(document.getElementById('inputXu').value);
+                    resultado = await MetodosNumericos.falsaPosicion(evaluador, xi_fp, xu_fp, tol, ui);
                     break;
                 case 'newton':
                     const x0 = parseFloat(document.getElementById('inputX0').value);
