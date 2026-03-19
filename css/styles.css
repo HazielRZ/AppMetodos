@@ -32,8 +32,8 @@ h1, h2, h3 {
 }
 
 .btn-menu {
-    background-color: #f1f1f1;
-    color: #2a292c;
+    background-color: #4a4e52;
+    color: #86868c;
     padding: 1.5rem;
     border-radius: 8px;
     text-decoration: none;
@@ -42,7 +42,7 @@ h1, h2, h3 {
 }
 
 .btn-menu:hover {
-    background-color: #e8e8ee;
+    background-color: #373636;
     transform: translateX(10px);
 }
 
@@ -50,7 +50,7 @@ h1, h2, h3 {
     border: none;
     padding: 0;
     margin-bottom: 0.5rem;
-    color: #2a292c;
+    color: #e83737;
 }
 
 .back-link {
