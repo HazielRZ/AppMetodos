@@ -1,10 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Método de Gauss-Seidel</title>
+    <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
+<nav class="navbar">
+    <div class="nav-brand">
+        <span>Métodos Numéricos</span>
+    </div>
+    <div class="menu-toggle" id="mobile-menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+    </div>
+    <div class="nav-links" id="nav-links">
+        <a href="../index.html">Inicio</a>
+        <a href="Jacobi.html">Jacobi</a>
+        <a href="GaussSeidel.html" style="color: #fafafa;">Gauss-Seidel</a>
+    </div>
+</nav>
 
+<div class="container" style="margin-top: 2rem;">
+    <a href="../index.html" class="back-link">← Volver al inicio</a>
+
+    <div class="page-header">
+        <h1>Método de Gauss-Seidel</h1>
+        <p>Resolución iterativa optimizada de sistemas de ecuaciones lineales</p>
+    </div>
+
+    <div class="controls-row">
+        <div class="form-group">
+            <label for="matrix-size">Tamaño de la matriz (n x n):</label>
+            <input type="number" id="matrix-size" min="2" max="10" value="3">
+        </div>
+        <div class="form-group">
+            <label for="tolerance">Tolerancia (Error esperado):</label>
+            <input type="number" id="tolerance" value="0.0001" step="0.0001">
+        </div>
+        <div class="form-group">
+            <label for="max-iter">Iteraciones Máximas:</label>
+            <input type="number" id="max-iter" value="100" min="1">
+        </div>
+    </div>
+
+    <button id="btn-generate" class="btn-primary">Generar Matriz</button>
+
+    <div id="matrix-container" style="margin-top: 2rem; display: none;">
+        <h3>Ingrese los coeficientes (A) y términos independientes (B)</h3>
+        <div id="matrix-grid" class="matrix-grid"></div>
+        <button id="btn-calculate" class="btn-primary" style="margin-top: 1.5rem;">Calcular Solución</button>
+    </div>
+
+    <div id="results-container" style="display: none;">
+        <div class="metrics-summary" id="convergence-warning">
+        </div>
+
+        <div class="table-container">
+            <table id="iterations-table">
+                <thead>
+                <tr id="table-header">
+                </tr>
+                </thead>
+                <tbody id="table-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="../Js/GaussSeidel.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = document.getElementById('nav-links');
+
+        if (mobileMenu && navLinks) {
+            mobileMenu.addEventListener('click', () => {
+                mobileMenu.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+        }
+    });
+</script>
 </body>
 </html>

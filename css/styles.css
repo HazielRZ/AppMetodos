@@ -385,3 +385,97 @@ td {
 
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
+/* ==========================================
+   Menú Hamburguesa (Mobile)
+   ========================================== */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    gap: 5px;
+    z-index: 100;
+}
+
+.menu-toggle .bar {
+    width: 25px;
+    height: 3px;
+    background-color: #fafafa;
+    border-radius: 3px;
+    transition: all 0.3s ease-in-out;
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: flex;
+    }
+
+    .nav-links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: #09090b; /* Fondo oscuro sólido para móviles */
+        border-bottom: 1px solid #27272a;
+        flex-direction: column;
+        align-items: center;
+        padding: 1.5rem 0;
+        gap: 1.5rem;
+        clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+        transition: clip-path 0.4s ease-out;
+    }
+
+    .nav-links.active {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+
+    /* Animación del ícono hamburguesa a 'X' */
+    .menu-toggle.active .bar:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+    .menu-toggle.active .bar:nth-child(2) {
+        opacity: 0;
+    }
+    .menu-toggle.active .bar:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
+}
+
+/* ==========================================
+   Cuadrícula de Entrada de Matrices
+   ========================================== */
+.matrix-grid {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.matrix-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.matrix-input {
+    width: 70px;
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #27272a;
+    background-color: #18181b;
+    color: #fafafa;
+    font-family: ui-monospace, monospace;
+}
+
+.matrix-input:focus {
+    outline: none;
+    border-color: #fafafa;
+}
+
+.matrix-divider {
+    width: 2px;
+    height: 100%;
+    background-color: #3f3f46;
+    margin: 0 0.5rem;
+}
